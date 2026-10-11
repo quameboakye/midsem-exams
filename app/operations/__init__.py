@@ -9,3 +9,9 @@ def subtraction(a: float, b: float) -> float:
 def multiplication(a: float, b: float) -> float:
     """Returns the product of two numbers."""
     return a * b
+
+def division(a: float, b: float) -> float:
+    """Returns the quotient of two numbers. Raises ValueError if b is zero."""
+    if b == 0:
+        raise ValueError("Cannot divide by zero.")
+    return a / b
