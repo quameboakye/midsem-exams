@@ -53,7 +53,7 @@ def test_non_numeric_input(monkeypatch, capsys):
 
 
 def test_unknown_operation(monkeypatch, capsys):
-    out = run_calculator(monkeypatch, capsys, ["power 2 3", "exit"])
+    out = run_calculator(monkeypatch, capsys, ["foo 2 3", "exit"])
     assert "Error: Invalid input" in out
 
 
@@ -65,3 +65,8 @@ def test_wrong_number_of_arguments(monkeypatch, capsys):
 def test_empty_input(monkeypatch, capsys):
     out = run_calculator(monkeypatch, capsys, ["", "exit"])
     assert "Error: Invalid input" in out
+
+
+def test_power(monkeypatch, capsys):
+    out = run_calculator(monkeypatch, capsys, ["power 2 3", "exit"])
+    assert "Result: 8.0" in out
