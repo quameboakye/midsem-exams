@@ -1,5 +1,6 @@
+import math
 import pytest
-from app.operations import addition, subtraction, multiplication, division, modulus
+from app.operations import addition, subtraction, multiplication, division, modulus, sqrt
 
 
 def test_addition():
@@ -42,4 +43,12 @@ def test_modulus_by_zero():
     with pytest.raises(ValueError, match="Cannot divide by zero."):
         modulus(10, 0)
 
-   
+def test_sqrt():
+    assert math.sqrt(9) == 3
+    assert math.sqrt(0) == 0
+    assert math.sqrt(2.25) == 1.5
+
+
+def test_sqrt_negative():
+    with pytest.raises(ValueError, match="Cannot take the square root of a negative number."):
+        sqrt(-4)

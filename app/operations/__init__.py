@@ -1,3 +1,5 @@
+import math
+
 def addition(a: float, b : float) -> float:
     """Returns the sum of two numbers."""
     return a + b
@@ -21,3 +23,10 @@ def modulus(a: float, b: float) -> float:
     if b == 0:
         raise ValueError("Cannot divide by zero.")
     return a % b
+
+
+def sqrt(a: float) -> float:
+    """Returns the square root of a number. Raises ValueError if a is negative."""
+    if a < 0:
+        raise ValueError("Cannot take the square root of a negative number.")
+    return math.sqrt(a)
