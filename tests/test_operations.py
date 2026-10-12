@@ -1,5 +1,5 @@
 import pytest
-from app.operations import addition, subtraction, multiplication, division
+from app.operations import addition, subtraction, multiplication, division, modulus
 
 
 def test_addition():
@@ -31,4 +31,15 @@ def test_division_positive():
 def test_division_by_zero():
     with pytest.raises(ValueError, match="Cannot divide by zero."):
         division(10, 0)
+
+def test_modulus():
+    assert modulus(10, 3) == 1
+    assert modulus(-10, 3) == 2
+    assert modulus(5.5, 2) == 1.5
+
+
+def test_modulus_by_zero():
+    with pytest.raises(ValueError, match="Cannot divide by zero."):
+        modulus(10, 0)
+
    

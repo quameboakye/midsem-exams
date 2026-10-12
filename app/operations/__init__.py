@@ -15,3 +15,9 @@ def division(a: float, b: float) -> float:
     if b == 0:
         raise ValueError("Cannot divide by zero.")
     return a / b
+
+def modulus(a: float, b: float) -> float:
+    """Returns the remainder of a divided by b. Raises ValueError if b is zero."""
+    if b == 0:
+        raise ValueError("Cannot divide by zero.")
+    return a % b
