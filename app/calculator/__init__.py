@@ -1,20 +1,13 @@
-from app.operations import (
-    addition,
-    subtraction,
-    multiplication,
-    division,
-    modulus,
-    sqrt,
-)
+from app.operations import Operations
 
+# Maps each two-number command to the Operations method that handles it.
 TWO_NUMBER_OPERATIONS = {
-    'add': addition,
-    'subtract': subtraction,
-    'multiply': multiplication,
-    'divide': division,
-    'modulus': modulus,
+    "add": Operations.addition,
+    "subtract": Operations.subtraction,
+    "multiply": Operations.multiplication,
+    "divide": Operations.division,
+    "modulus": Operations.modulus,
 }
-
 
 def calculator():
 
@@ -40,7 +33,7 @@ def calculator():
                 result = TWO_NUMBER_OPERATIONS[operation](float(parts[1]), float(parts[2]))
 
             elif operation == 'sqrt' and len(parts) == 2:
-                result = sqrt(float(parts[1]))
+                result = Operations.sqrt(float(parts[1]))
 
             else:
                 raise ValueError(
