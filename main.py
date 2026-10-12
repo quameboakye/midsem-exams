@@ -23,8 +23,8 @@ Version: 1.0
 
 
 
-from app.calculator_repl import calculator_repl
+from app.calculator import calculator
 
 
 if __name__ == "__main__":
-    calculator_repl()
+    calculator()
