@@ -7,6 +7,7 @@ TWO_NUMBER_OPERATIONS = {
     "multiply": Operations.multiplication,
     "divide": Operations.division,
     "modulus": Operations.modulus,
+    "power": Operations.power,
 }
 
 def calculator():
@@ -16,7 +17,7 @@ def calculator():
     while True:
 
         user_input = input(
-            "Enter an operation (add, subtract, multiply, divide, modulus, sqrt) "
+            "Enter an operation (add, subtract, multiply, divide, modulus, power, sqrt) "
             "followed by numbers: "
         )
 
@@ -38,7 +39,7 @@ def calculator():
             else:
                 raise ValueError(
                     "Invalid input. Use '<operation> <num1> <num2>' "
-                    "(add, subtract, multiply, divide, modulus) or 'sqrt <num>'."
+                    "(add, subtract, multiply, divide, modulus, power) or 'sqrt <num>'."
                 )
 
             print(f"Result: {result}")
