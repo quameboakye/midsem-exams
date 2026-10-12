@@ -37,3 +37,8 @@ class Operations:
         if a < 0:
             raise ValueError("Cannot take the square root of a negative number.")
         return math.sqrt(a)
+
+    @staticmethod
+    def power(a: float, b: float) -> float:
+        """Returns a raised to the power of b."""
+        return a ** b
