@@ -1,21 +1,11 @@
-"""
-Unit tests for app.operations.
 
-Each operation is tested with pytest.mark.parametrize so that many input
-combinations run through a single test function. For invalid input
-(division by zero, modulus by zero, square root of a negative number) the
-tests check that:
-  1. the correct exception type (ValueError) is raised, and
-  2. the exception message tells the user exactly what went wrong.
-"""
 
 from typing import Union
 
 import pytest
 
-from app.operations import addition, subtraction, multiplication, division, modulus, sqrt
+from app.operations import Operations
 
-# Type alias used in the type hints below: a number is an int or a float.
 Number = Union[int, float]
 
 
@@ -35,15 +25,15 @@ Number = Union[int, float]
 )
 def test_addition(a: Number, b: Number, expected: Number) -> None:
     """
-    Test that addition(a, b) returns the expected sum.
+    Test that Operations.addition(a, b) returns the expected sum.
 
     Parameters:
         a: first number
         b: second number
-        expected: the sum we expect addition(a, b) to return
+        expected: the sum we expect Operations.addition(a, b) to return
     """
-    result = addition(a, b)
-    assert result == expected, f"Expected addition({a}, {b}) to be {expected}, but got {result}"
+    result = Operations.addition(a, b)
+    assert result == expected, f"Expected Operations.addition({a}, {b}) to be {expected}, but got {result}"
 
 
 # ---------------------------------------------------------------------------
@@ -62,15 +52,15 @@ def test_addition(a: Number, b: Number, expected: Number) -> None:
 )
 def test_subtraction(a: Number, b: Number, expected: Number) -> None:
     """
-    Test that subtraction(a, b) returns a minus b.
+    Test that Operations.subtraction(a, b) returns a minus b.
 
     Parameters:
         a: the number to subtract from
         b: the number being subtracted
-        expected: the difference we expect subtraction(a, b) to return
+        expected: the difference we expect Operations.subtraction(a, b) to return
     """
-    result = subtraction(a, b)
-    assert result == expected, f"Expected subtraction({a}, {b}) to be {expected}, but got {result}"
+    result = Operations.subtraction(a, b)
+    assert result == expected, f"Expected Operations.subtraction({a}, {b}) to be {expected}, but got {result}"
 
 
 # ---------------------------------------------------------------------------
@@ -89,15 +79,15 @@ def test_subtraction(a: Number, b: Number, expected: Number) -> None:
 )
 def test_multiplication(a: Number, b: Number, expected: Number) -> None:
     """
-    Test that multiplication(a, b) returns the expected product.
+    Test that Operations.multiplication(a, b) returns the expected product.
 
     Parameters:
         a: first number
         b: second number
-        expected: the product we expect multiplication(a, b) to return
+        expected: the product we expect Operations.multiplication(a, b) to return
     """
-    result = multiplication(a, b)
-    assert result == expected, f"Expected multiplication({a}, {b}) to be {expected}, but got {result}"
+    result = Operations.multiplication(a, b)
+    assert result == expected, f"Expected Operations.multiplication({a}, {b}) to be {expected}, but got {result}"
 
 
 # ---------------------------------------------------------------------------
@@ -113,15 +103,15 @@ def test_multiplication(a: Number, b: Number, expected: Number) -> None:
 )
 def test_division_positive(a: Number, b: Number, expected: Number) -> None:
     """
-    Test that division(a, b) returns a divided by b when b is not zero.
+    Test that Operations.division(a, b) returns a divided by b when b is not zero.
 
     Parameters:
         a: the dividend
         b: the divisor (non-zero)
-        expected: the quotient we expect division(a, b) to return
+        expected: the quotient we expect Operations.division(a, b) to return
     """
-    result = division(a, b)
-    assert result == expected, f"Expected division({a}, {b}) to be {expected}, but got {result}"
+    result = Operations.division(a, b)
+    assert result == expected, f"Expected Operations.division({a}, {b}) to be {expected}, but got {result}"
 
 
 @pytest.mark.parametrize(
@@ -137,15 +127,15 @@ def test_division_by_zero(a: Number) -> None:
     Parameters:
         a: the dividend (the divisor is always 0 in this test)
 
-    Example: test_division_by_zero(-5) calls division(-5, 0), which must
+    Example: test_division_by_zero(-5) calls Operations.division(-5, 0), which must
     raise ValueError("Cannot divide by zero.").
     """
-    # Use pytest's context manager to check for a ValueError when dividing by zero.
+    
     with pytest.raises(ValueError, match="Cannot divide by zero.") as excinfo:
         # Attempt to divide 'a' by 0, which should raise a ValueError.
-        division(a, 0)
+        Operations.division(a, 0)
 
-    # Assert that the exception message contains the expected error message.
+    
     assert "Cannot divide by zero." in str(excinfo.value), (
         f"Expected error message 'Cannot divide by zero.' "
         f"but got '{excinfo.value}'"
@@ -159,22 +149,22 @@ def test_division_by_zero(a: Number) -> None:
     "a, b, expected",
     [
         (10, 3, 1),
-        (-10, 3, 2),  # Python's modulo takes the sign of the divisor
+        (-10, 3, 2), 
         (5.5, 2, 1.5),
     ],
     ids=["positive", "negative_dividend", "float"],
 )
 def test_modulus(a: Number, b: Number, expected: Number) -> None:
     """
-    Test that modulus(a, b) returns the remainder of a divided by b.
+    Test that Operations.modulus(a, b) returns the remainder of a divided by b.
 
     Parameters:
         a: the dividend
         b: the divisor (non-zero)
-        expected: the remainder we expect modulus(a, b) to return
+        expected: the remainder we expect Operations.modulus(a, b) to return
     """
-    result = modulus(a, b)
-    assert result == expected, f"Expected modulus({a}, {b}) to be {expected}, but got {result}"
+    result = Operations.modulus(a, b)
+    assert result == expected, f"Expected Operations.modulus({a}, {b}) to be {expected}, but got {result}"
 
 
 @pytest.mark.parametrize(
@@ -190,15 +180,14 @@ def test_modulus_by_zero(a: Number) -> None:
     Parameters:
         a: the dividend (the divisor is always 0 in this test)
 
-    Example: test_modulus_by_zero(10) calls modulus(10, 0), which must
+    Example: test_modulus_by_zero(10) calls Operations.modulus(10, 0), which must
     raise ValueError("Cannot divide by zero.").
     """
-    # Use pytest's context manager to check for a ValueError when the divisor is zero.
+    
     with pytest.raises(ValueError, match="Cannot divide by zero.") as excinfo:
         # Attempt a modulus by zero, which should raise a ValueError.
-        modulus(a, 0)
+        Operations.modulus(a, 0)
 
-    # Assert that the exception message contains the expected error message.
     assert "Cannot divide by zero." in str(excinfo.value), (
         f"Expected error message 'Cannot divide by zero.' "
         f"but got '{excinfo.value}'"
@@ -219,14 +208,14 @@ def test_modulus_by_zero(a: Number) -> None:
 )
 def test_sqrt(value: Number, expected: Number) -> None:
     """
-    Test that sqrt(value) returns the square root of a non-negative number.
+    Test that Operations.sqrt(value) returns the square root of a non-negative number.
 
     Parameters:
         value: a number that is zero or greater
-        expected: the square root we expect sqrt(value) to return
+        expected: the square root we expect Operations.sqrt(value) to return
     """
-    result = sqrt(value)
-    assert result == expected, f"Expected sqrt({value}) to be {expected}, but got {result}"
+    result = Operations.sqrt(value)
+    assert result == expected, f"Expected Operations.sqrt({value}) to be {expected}, but got {result}"
 
 
 @pytest.mark.parametrize(
@@ -242,15 +231,15 @@ def test_sqrt_negative(value: Number) -> None:
     Parameters:
         value: a negative number
 
-    Example: test_sqrt_negative(-4) calls sqrt(-4), which must raise
+    Example: test_sqrt_negative(-4) calls Operations.sqrt(-4), which must raise
     ValueError("Cannot take the square root of a negative number.").
     """
-    # Use pytest's context manager to check for a ValueError on negative input.
+    
     with pytest.raises(ValueError, match="Cannot take the square root of a negative number.") as excinfo:
-        # Attempt to take the square root of a negative number, which should raise a ValueError.
-        sqrt(value)
+        
+        Operations.sqrt(value)
 
-    # Assert that the exception message contains the expected error message.
+
     assert "Cannot take the square root of a negative number." in str(excinfo.value), (
         f"Expected error message 'Cannot take the square root of a negative number.' "
         f"but got '{excinfo.value}'"
