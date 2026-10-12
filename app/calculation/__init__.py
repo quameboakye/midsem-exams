@@ -1,5 +1,5 @@
 from abc import ABC, abstractmethod
-from app.operation import Operation
+from app.operations import Operations as Operation
 
 
 class Calculation(ABC):
