@@ -44,9 +44,10 @@ def test_modulus_by_zero():
         modulus(10, 0)
 
 def test_sqrt():
-    assert math.sqrt(9) == 3
-    assert math.sqrt(0) == 0
-    assert math.sqrt(2.25) == 1.5
+    from app.operations import sqrt
+    assert sqrt(9) == 3
+    assert sqrt(0) == 0
+    assert sqrt(2.25) == 1.5
 
 
 def test_sqrt_negative():

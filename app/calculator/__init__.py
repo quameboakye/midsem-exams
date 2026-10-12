@@ -7,6 +7,14 @@ from app.operations import (
     sqrt,
 )
 
+TWO_NUMBER_OPERATIONS = {
+    'add': addition,
+    'subtract': subtraction,
+    'multiply': multiplication,
+    'divide': division,
+    'modulus': modulus,
+}
+
 
 def calculator():
 
@@ -28,20 +36,8 @@ def calculator():
             parts = user_input.split()
             operation = parts[0] if parts else ""
 
-            if operation in ('add', 'subtract', 'multiply', 'divide', 'modulus') and len(parts) == 3:
-                num1 = float(parts[1])
-                num2 = float(parts[2])
-
-                if operation == 'add':
-                    result = addition(num1, num2)
-                elif operation == 'subtract':
-                    result = subtraction(num1, num2)
-                elif operation == 'multiply':
-                    result = multiplication(num1, num2)
-                elif operation == 'divide':
-                    result = division(num1, num2)
-                elif operation == 'modulus':
-                    result = modulus(num1, num2)
+            if operation in TWO_NUMBER_OPERATIONS and len(parts) == 3:
+                result = TWO_NUMBER_OPERATIONS[operation](float(parts[1]), float(parts[2]))
 
             elif operation == 'sqrt' and len(parts) == 2:
                 result = sqrt(float(parts[1]))
