@@ -21,7 +21,7 @@ def calculator_repl():
 
                 if command == 'help':
                     print("\nAvailable commands:")
-                    print("  add, subtract, multiply, divide, power, root - Perform calculations")
+                    print("  add, subtract, multiply, divide, modulus, power, sqrt - Perform calculations")
                     print("  history - Show calculation history")
                     print("  clear - Clear calculation history")
                     print("  undo - Undo the last calculation")
@@ -85,17 +85,21 @@ def calculator_repl():
                         print(f"Error loading history: {e}")
                     continue
 
-                if command in ['add', 'subtract', 'multiply', 'divide', 'power', 'root']:
+                if command in ['add', 'subtract', 'multiply', 'divide', 'modulus', 'power', 'sqrt', 'root']:
                     try:
                         print("\nEnter numbers (or 'cancel' to abort):")
                         a = input("First number: ")
                         if a.lower() == 'cancel':
                             print("Operation cancelled")
                             continue
-                        b = input("Second number: ")
-                        if b.lower() == 'cancel':
-                            print("Operation cancelled")
-                            continue
+
+                        if command in ['sqrt', 'root']:
+                            b = "0"
+                        else:
+                            b = input("Second number: ")
+                            if b.lower() == 'cancel':
+                                print("Operation cancelled")
+                                continue
 
                         operation = OperationFactory.create_operation(command)
                         calc.set_operation(operation)
