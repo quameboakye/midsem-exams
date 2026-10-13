@@ -43,7 +43,10 @@ class Operations:
 class Operation(ABC):
     @abstractmethod
     def execute(self, a: Decimal, b: Decimal = Decimal('0')) -> Decimal:
-        pass
+        pass  # pragma: no cover
+
+    def __str__(self) -> str:
+        return self.__class__.__name__
 
 
 class Addition(Operation):
@@ -85,6 +88,10 @@ class Sqrt(Operation):
             raise OperationError(str(e))
 
 
+class Root(Sqrt):
+    pass
+
+
 class Power(Operation):
     def execute(self, a: Decimal, b: Decimal) -> Decimal:
         return Decimal(str(Operations.power(float(a), float(b))))
@@ -98,7 +105,7 @@ class OperationFactory:
         'divide': Division(),
         'modulus': Modulus(),
         'sqrt': Sqrt(),
-        'root': Sqrt(),
+        'root': Root(),
         'power': Power()
     }
 
