@@ -1,12 +1,7 @@
-import pytest
-from unittest.mock import MagicMock
-
-from app.calculator_repl import calculator_repl
-from app.exceptions import OperationError, ValidationError
-
 from decimal import Decimal
-import pytest
 from unittest.mock import MagicMock
+
+import pytest
 
 from app.calculator_repl import calculator_repl
 from app.exceptions import OperationError, ValidationError
@@ -148,6 +143,7 @@ def test_fatal_error_on_init(monkeypatch, capsys):
         calculator_repl()
     assert "Fatal error: init failed" in capsys.readouterr().out
 
+
 def test_help_command(monkeypatch, capsys, calc):
     out = run_repl(monkeypatch, capsys, ["help", "exit"])
     assert "Available commands:" in out
@@ -158,3 +154,44 @@ def test_modulus_and_sqrt_commands(monkeypatch, capsys, calc):
     calc.perform_operation.return_value = Decimal('2.0')
     out = run_repl(monkeypatch, capsys, ["modulus", "10", "4", "sqrt", "4", "exit"])
     assert "Result: 2" in out
+
+def test_empty_input(monkeypatch, capsys, calc):
+    run_repl(monkeypatch, capsys, ["", "   ", "exit"])
+    calc.perform_operation.assert_not_called()
+
+
+def test_binary_operation_inline_args(monkeypatch, capsys, calc):
+    calc.perform_operation.return_value = Decimal("5")
+    out = run_repl(monkeypatch, capsys, ["add 2 3", "exit"])
+    calc.perform_operation.assert_called_once()
+    assert "Result: 5" in out
+
+
+def test_sqrt_inline_arg(monkeypatch, capsys, calc):
+    calc.perform_operation.return_value = Decimal("4")
+    out = run_repl(monkeypatch, capsys, ["sqrt 16", "exit"])
+    assert "Result: 4" in out
+
+
+def test_sqrt_prompts_for_number(monkeypatch, capsys, calc):
+    calc.perform_operation.return_value = Decimal("4")
+    out = run_repl(monkeypatch, capsys, ["sqrt", "16", "exit"])
+    assert "Result: 4" in out
+
+
+def test_sqrt_cancel(monkeypatch, capsys, calc):
+    out = run_repl(monkeypatch, capsys, ["sqrt", "cancel", "exit"])
+    assert "Operation cancelled" in out
+    calc.perform_operation.assert_not_called()
+
+
+def test_save_when_calc_has_no_save_history(monkeypatch, capsys, calc):
+    del calc.save_history  # makes hasattr(calc, "save_history") False
+    out = run_repl(monkeypatch, capsys, ["save", "exit"])
+    assert "History saved successfully" in out
+
+
+def test_load_when_calc_has_no_load_history(monkeypatch, capsys, calc):
+    del calc.load_history  # makes hasattr(calc, "load_history") False
+    out = run_repl(monkeypatch, capsys, ["load", "exit"])
+    assert "History loaded successfully" in out
