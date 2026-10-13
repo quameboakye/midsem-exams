@@ -7,6 +7,22 @@ class Calculation(ABC):
         self.a: float = a
         self.b: float = b
 
+    @property
+    def operation(self) -> str:
+        return self.__class__.__name__.replace('Calculation', '')
+
+    @property
+    def operand1(self) -> float:
+        return self.a
+
+    @property
+    def operand2(self) -> float:
+        return self.b
+
+    @property
+    def result(self) -> float:
+        return self.execute()
+
     @abstractmethod
     def execute(self) -> float:
         pass  # pragma: no cover
