@@ -4,6 +4,13 @@ from unittest.mock import MagicMock
 from app.calculator_repl import calculator_repl
 from app.exceptions import OperationError, ValidationError
 
+from decimal import Decimal
+import pytest
+from unittest.mock import MagicMock
+
+from app.calculator_repl import calculator_repl
+from app.exceptions import OperationError, ValidationError
+
 
 def run_repl(monkeypatch, capsys, inputs):
     it = iter(inputs)
@@ -140,3 +147,14 @@ def test_fatal_error_on_init(monkeypatch, capsys):
     with pytest.raises(RuntimeError):
         calculator_repl()
     assert "Fatal error: init failed" in capsys.readouterr().out
+
+def test_help_command(monkeypatch, capsys, calc):
+    out = run_repl(monkeypatch, capsys, ["help", "exit"])
+    assert "Available commands:" in out
+    assert "add, subtract, multiply, divide, modulus, power, sqrt" in out
+
+
+def test_modulus_and_sqrt_commands(monkeypatch, capsys, calc):
+    calc.perform_operation.return_value = Decimal('2.0')
+    out = run_repl(monkeypatch, capsys, ["modulus", "10", "4", "sqrt", "4", "exit"])
+    assert "Result: 2" in out
