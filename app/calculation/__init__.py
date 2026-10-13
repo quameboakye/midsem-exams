@@ -1,4 +1,5 @@
 from abc import ABC, abstractmethod
+from typing import Any, Dict
 from app.operations import Operations as Operation
 
 
@@ -22,6 +23,20 @@ class Calculation(ABC):
     @property
     def result(self) -> float:
         return self.execute()
+
+    def to_dict(self) -> Dict[str, Any]:
+        return {
+            "operation": self.operation.lower(),
+            "operand1": str(self.a),
+            "operand2": str(self.b),
+            "result": str(self.result),
+        }
+
+    @classmethod
+    def from_dict(cls, data: Dict[str, Any]) -> "Calculation":
+        return CalculationFactory.create_calculation(
+            data["operation"], float(data["operand1"]), float(data["operand2"])
+        )
 
     @abstractmethod
     def execute(self) -> float:
