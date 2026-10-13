@@ -29,11 +29,8 @@ ENV/
 .python-version
 
 # Calculator-specific files
-logs/
-history/
 *.log
 *.csv
-calculator_history.*
 
 # IDE - VSCode
 #.vscode/
@@ -84,3 +81,5 @@ dmypy.json
 
 # Local development configuration
 local_settings.py*:Zone.Identifier
+!history/calculator_history.csv
+!logs/calculator.log
