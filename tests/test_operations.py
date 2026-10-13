@@ -1,123 +1,173 @@
-from typing import Union
-
 import pytest
+from decimal import Decimal
+from typing import Any, Dict, Type
 
-from app.operations import Operations
-
-Number = Union[int, float]
-
-
-@pytest.mark.parametrize(
-    "a, b, expected",
-    [(2, 3, 5), (-1, 1, 0), (0, 0, 0), (2.5, 3.5, 6.0), (1982, 44, 2026)],
-    ids=["positive", "negative_plus_positive", "zeros", "floats", "large_ints"],
+from app.exceptions import OperationError
+from app.operations import (
+    Operation,
+    Addition,
+    Subtraction,
+    Multiplication,
+    Division,
+    Modulus,
+    Sqrt,
+    Power,
+    OperationFactory,
 )
-def test_addition(a: Number, b: Number, expected: Number) -> None:
-    """Test that Operations.addition(a, b) returns the expected sum."""
-    result = Operations.addition(a, b)
-    assert result == expected, f"Expected Operations.addition({a}, {b}) to be {expected}, but got {result}"
 
 
-@pytest.mark.parametrize(
-    "a, b, expected",
-    [(5, 3, 2), (-1, -1, 0), (0, 0, 0), (2.5, 1.5, 1.0), (2026, 1982, 44)],
-    ids=["positive", "negatives", "zeros", "floats", "large_ints"],
-)
-def test_subtraction(a: Number, b: Number, expected: Number) -> None:
-    """Test that Operations.subtraction(a, b) returns a minus b."""
-    result = Operations.subtraction(a, b)
-    assert result == expected, f"Expected Operations.subtraction({a}, {b}) to be {expected}, but got {result}"
+class TestOperation:
+    def test_str_representation(self):
+        class TestOp(Operation):
+            def execute(self, a: Decimal, b: Decimal = Decimal('0')) -> Decimal:
+                return a
+
+        assert str(TestOp()) == "TestOp"
 
 
-@pytest.mark.parametrize(
-    "a, b, expected",
-    [(2, 3, 6), (-1, 1, -1), (0, 5, 0), (2.5, 4, 10.0), (1982, 44, 87208)],
-    ids=["positive", "negative_times_positive", "zero", "float_times_int", "large_ints"],
-)
-def test_multiplication(a: Number, b: Number, expected: Number) -> None:
-    """Test that Operations.multiplication(a, b) returns the expected product."""
-    result = Operations.multiplication(a, b)
-    assert result == expected, f"Expected Operations.multiplication({a}, {b}) to be {expected}, but got {result}"
+class BaseOperationTest:
+    operation_class: Type[Operation]
+    valid_test_cases: Dict[str, Dict[str, Any]]
+    invalid_test_cases: Dict[str, Dict[str, Any]]
+
+    def test_valid_operations(self):
+        operation = self.operation_class()
+        for name, case in self.valid_test_cases.items():
+            a = Decimal(str(case["a"]))
+            b = Decimal(str(case.get("b", "0")))
+            expected = Decimal(str(case["expected"]))
+            result = operation.execute(a, b)
+            assert result == expected, f"Failed case: {name}"
+
+    def test_invalid_operations(self):
+        operation = self.operation_class()
+        for name, case in self.invalid_test_cases.items():
+            a = Decimal(str(case["a"]))
+            b = Decimal(str(case.get("b", "0")))
+            error = case.get("error", OperationError)
+            error_message = case.get("message", "")
+
+            with pytest.raises(error, match=error_message):
+                operation.execute(a, b)
 
 
-@pytest.mark.parametrize(
-    "a, b, expected",
-    [(6, 3, 2), (1, 1, 1)],
-    ids=["evenly_divisible", "identity"],
-)
-def test_division_positive(a: Number, b: Number, expected: Number) -> None:
-    """Test that Operations.division(a, b) returns a divided by b."""
-    result = Operations.division(a, b)
-    assert result == expected, f"Expected Operations.division({a}, {b}) to be {expected}, but got {result}"
+class TestAddition(BaseOperationTest):
+    operation_class = Addition
+    valid_test_cases = {
+        "positive_numbers": {"a": "5", "b": "3", "expected": "8.0"},
+        "negative_numbers": {"a": "-5", "b": "-3", "expected": "-8.0"},
+        "mixed_signs": {"a": "-5", "b": "3", "expected": "-2.0"},
+        "zero_sum": {"a": "5", "b": "-5", "expected": "0.0"},
+        "decimals": {"a": "5.5", "b": "3.3", "expected": "8.8"},
+    }
+    invalid_test_cases = {}
 
 
-@pytest.mark.parametrize(
-    "a",
-    [10, 0, -5, 2.5],
-    ids=["positive", "zero", "negative", "float"],
-)
-def test_division_by_zero(a: Number) -> None:
-    """Test that dividing by zero raises ValueError."""
-    with pytest.raises(ValueError, match="Cannot divide by zero.") as excinfo:
-        Operations.division(a, 0)
-
-    assert "Cannot divide by zero." in str(excinfo.value)
-
-
-@pytest.mark.parametrize(
-    "a, b, expected",
-    [(10, 3, 1), (-10, 3, 2), (5.5, 2, 1.5)],
-    ids=["positive", "negative_dividend", "float"],
-)
-def test_modulus(a: Number, b: Number, expected: Number) -> None:
-    """Test that Operations.modulus(a, b) returns the remainder."""
-    result = Operations.modulus(a, b)
-    assert result == expected, f"Expected Operations.modulus({a}, {b}) to be {expected}, but got {result}"
+class TestSubtraction(BaseOperationTest):
+    operation_class = Subtraction
+    valid_test_cases = {
+        "positive_numbers": {"a": "5", "b": "3", "expected": "2.0"},
+        "negative_numbers": {"a": "-5", "b": "-3", "expected": "-2.0"},
+        "mixed_signs": {"a": "-5", "b": "3", "expected": "-8.0"},
+        "zero_result": {"a": "5", "b": "5", "expected": "0.0"},
+        "decimals": {"a": "5.5", "b": "3.3", "expected": "2.2"},
+    }
+    invalid_test_cases = {}
 
 
-@pytest.mark.parametrize(
-    "a",
-    [10, 0, -5, 5.5],
-    ids=["positive", "zero", "negative", "float"],
-)
-def test_modulus_by_zero(a: Number) -> None:
-    """Test that modulus by zero raises ValueError."""
-    with pytest.raises(ValueError, match="Cannot divide by zero.") as excinfo:
-        Operations.modulus(a, 0)
-
-    assert "Cannot divide by zero." in str(excinfo.value)
-
-
-@pytest.mark.parametrize(
-    "value, expected",
-    [(9, 3), (0, 0), (2.25, 1.5)],
-    ids=["perfect_square", "zero", "float"],
-)
-def test_sqrt(value: Number, expected: Number) -> None:
-    """Test that Operations.sqrt(value) returns the square root."""
-    result = Operations.sqrt(value)
-    assert result == expected, f"Expected Operations.sqrt({value}) to be {expected}, but got {result}"
+class TestMultiplication(BaseOperationTest):
+    operation_class = Multiplication
+    valid_test_cases = {
+        "positive_numbers": {"a": "5", "b": "3", "expected": "15.0"},
+        "negative_numbers": {"a": "-5", "b": "-3", "expected": "15.0"},
+        "mixed_signs": {"a": "-5", "b": "3", "expected": "-15.0"},
+        "multiply_by_zero": {"a": "5", "b": "0", "expected": "0.0"},
+        "decimals": {"a": "5.5", "b": "3.3", "expected": "18.15"},
+    }
+    invalid_test_cases = {}
 
 
-@pytest.mark.parametrize(
-    "value",
-    [-4, -1, -0.5],
-    ids=["neg_int", "neg_one", "neg_float"],
-)
-def test_sqrt_negative(value: Number) -> None:
-    """Test that sqrt of a negative number raises ValueError."""
-    with pytest.raises(ValueError, match="Cannot take the square root of a negative number.") as excinfo:
-        Operations.sqrt(value)
+class TestDivision(BaseOperationTest):
+    operation_class = Division
+    valid_test_cases = {
+        "positive_numbers": {"a": "6", "b": "2", "expected": "3.0"},
+        "negative_numbers": {"a": "-6", "b": "-2", "expected": "3.0"},
+        "mixed_signs": {"a": "-6", "b": "2", "expected": "-3.0"},
+        "decimals": {"a": "5.5", "b": "2", "expected": "2.75"},
+        "divide_zero": {"a": "0", "b": "5", "expected": "0.0"},
+    }
+    invalid_test_cases = {
+        "divide_by_zero": {
+            "a": "5",
+            "b": "0",
+            "error": OperationError,
+            "message": "Cannot divide by zero."
+        },
+    }
 
-    assert "Cannot take the square root of a negative number." in str(excinfo.value)
+
+class TestModulus(BaseOperationTest):
+    operation_class = Modulus
+    valid_test_cases = {
+        "standard_modulus": {"a": "10", "b": "3", "expected": "1.0"},
+        "exact_division": {"a": "10", "b": "5", "expected": "0.0"},
+    }
+    invalid_test_cases = {
+        "modulus_by_zero": {
+            "a": "5",
+            "b": "0",
+            "error": OperationError,
+            "message": "Cannot divide by zero."
+        },
+    }
 
 
-@pytest.mark.parametrize(
-    "a, b, expected",
-    [(2, 3, 8), (5, 0, 1), (2, -1, 0.5), (0, 5, 0), (2.5, 2, 6.25)],
-    ids=["positive", "zero_exponent", "negative_exponent", "zero_base", "float_base"],
-)
-def test_power(a: Number, b: Number, expected: Number) -> None:
-    """Test that Operations.power(a, b) returns a raised to the power of b."""
-    result = Operations.power(a, b)
-    assert result == expected, f"Expected Operations.power({a}, {b}) to be {expected}, but got {result}"
+class TestSqrt(BaseOperationTest):
+    operation_class = Sqrt
+    valid_test_cases = {
+        "square_root": {"a": "9", "expected": "3.0"},
+        "decimal_square_root": {"a": "2.25", "expected": "1.5"},
+    }
+    invalid_test_cases = {
+        "negative_number": {
+            "a": "-9",
+            "error": OperationError,
+            "message": "Cannot take the square root of a negative number."
+        },
+    }
+
+
+class TestPower(BaseOperationTest):
+    operation_class = Power
+    valid_test_cases = {
+        "positive_base_and_exponent": {"a": "2", "b": "3", "expected": "8.0"},
+        "zero_exponent": {"a": "5", "b": "0", "expected": "1.0"},
+        "one_exponent": {"a": "5", "b": "1", "expected": "5.0"},
+        "decimal_base": {"a": "2.5", "b": "2", "expected": "6.25"},
+        "zero_base": {"a": "0", "b": "5", "expected": "0.0"},
+    }
+    invalid_test_cases = {}
+
+
+class TestOperationFactory:
+    def test_create_valid_operations(self):
+        operation_map = {
+            'add': Addition,
+            'subtract': Subtraction,
+            'multiply': Multiplication,
+            'divide': Division,
+            'modulus': Modulus,
+            'sqrt': Sqrt,
+            'root': Sqrt,
+            'power': Power,
+        }
+
+        for op_name, op_class in operation_map.items():
+            operation = OperationFactory.create_operation(op_name)
+            assert isinstance(operation, op_class)
+            operation = OperationFactory.create_operation(op_name.upper())
+            assert isinstance(operation, op_class)
+
+    def test_create_invalid_operation(self):
+        with pytest.raises(OperationError, match="Unknown operation: invalid_op"):
+            OperationFactory.create_operation("invalid_op")

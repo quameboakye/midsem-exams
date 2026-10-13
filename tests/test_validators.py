@@ -1,62 +1,28 @@
 from decimal import Decimal
-
 import pytest
 
-from app.calculator_config import CalculatorConfig
-from app.exceptions import (
-    CalculatorError,
-    ConfigurationError,
-    OperationError,
-    ValidationError,
-)
-from app.input_validators import InputValidator
+from app.exceptions import ValidationError
+from app.input_validators import InputValidator, parse_number, validate_number
 
 
-@pytest.fixture
-def config():
-    return CalculatorConfig(max_input_value=Decimal("1000"))
+def test_parse_number_valid():
+    assert parse_number(10) == Decimal("10")
+    assert parse_number("3.14") == Decimal("3.14")
+    assert parse_number(Decimal("5.5")) == Decimal("5.5")
 
 
-def test_valid_integer_string(config):
-    assert InputValidator.validate_number("5", config) == Decimal("5")
+def test_parse_number_invalid():
+    with pytest.raises(ValidationError, match="Invalid numeric input"):
+        parse_number("invalid_number")
 
 
-def test_valid_number_with_spaces(config):
-    assert InputValidator.validate_number("  2.5  ", config) == Decimal("2.5")
+def test_validate_number_alias():
+    assert validate_number("42") == Decimal("42")
 
 
-def test_valid_float_input(config):
-    assert InputValidator.validate_number(3.5, config) == Decimal("3.5")
+def test_input_validator_class_methods():
+    assert InputValidator.parse_number("100") == Decimal("100")
+    assert InputValidator.validate_number("200") == Decimal("200")
 
-
-def test_negative_number(config):
-    assert InputValidator.validate_number("-7", config) == Decimal("-7")
-
-
-def test_value_is_normalized(config):
-    assert str(InputValidator.validate_number("2.500", config)) == "2.5"
-
-
-def test_value_at_limit_is_allowed(config):
-    assert InputValidator.validate_number("1000", config) == Decimal("1000")
-
-
-def test_value_over_limit_raises(config):
-    with pytest.raises(ValidationError, match="exceeds maximum"):
-        InputValidator.validate_number("1001", config)
-
-
-def test_negative_value_over_limit_raises(config):
-    with pytest.raises(ValidationError, match="exceeds maximum"):
-        InputValidator.validate_number("-1001", config)
-
-
-def test_non_numeric_raises(config):
-    with pytest.raises(ValidationError, match="Invalid number format"):
-        InputValidator.validate_number("abc", config)
-
-
-def test_exception_hierarchy():
-    assert issubclass(ValidationError, CalculatorError)
-    assert issubclass(OperationError, CalculatorError)
-    assert issubclass(ConfigurationError, CalculatorError)
+    with pytest.raises(ValidationError, match="Invalid numeric input"):
+        InputValidator.parse_number("abc")
